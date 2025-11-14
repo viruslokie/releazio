@@ -8,7 +8,7 @@
 - ✅ **Проверка обновлений** — Использование метода `checkUpdates()`
 - ✅ **Отображение UpdateState** — Показ состояния обновлений и типов
 - ✅ **Changelog с WebView** — Отображение постов в встроенном браузере
-- ✅ **Попапы обновлений** — Два стиля: Native iOS Alert и Olimp
+- ✅ **Попапы обновлений** — Два стиля: Native iOS Alert и InAppUpdate
 - ✅ **VersionView** — Компонент версии с кнопкой обновления
 - ✅ **Локализация** — Поддержка русского и английского языков
 - ✅ **Темная/светлая тема** — Переключение цветовых схем
@@ -60,7 +60,7 @@ Releazio.configure(with: configuration)
 - **Check Updates** — Проверка обновлений через `checkUpdates()`
 - **Show Changelog** — Открытие changelog с WebView
 - **Show Native Alert** — Показ попапа в стиле Native iOS
-- **Show Olimp Style** — Показ попапа в стиле Olimp
+- **Show InAppUpdate Style** — Показ попапа в стиле InAppUpdate
 - **Switch Theme** — Переключение светлой/темной темы
 
 #### Статус обновлений (Update Status)
@@ -168,30 +168,30 @@ ReleazioUpdatePromptView(
 )
 ```
 
-### 4. Показ попапа (Olimp стиль)
+### 4. Показ попапа (InAppUpdate стиль)
 
 ```swift
 ReleazioUpdatePromptView(
     updateState: state,
-    style: .olimp,
+    style: .inAppUpdate,
     locale: "ru",
     onUpdate: {
         Releazio.shared.openAppStore(updateState: state)
-        showingUpdatePromptOlimp = false
+        showingUpdatePromptInAppUpdate = false
     },
     onSkip: { remaining in
         print("Пропущено, осталось: \(remaining)")
-        showingUpdatePromptOlimp = false
+        showingUpdatePromptInAppUpdate = false
     },
     onClose: {
-        showingUpdatePromptOlimp = false
+        showingUpdatePromptInAppUpdate = false
     },
     onInfoTap: {
         Releazio.shared.openPostURL(updateState: state)
     }
 )
-.fullScreenCover(isPresented: $showingUpdatePromptOlimp) {
-    // Full screen для Olimp стиля
+.fullScreenCover(isPresented: $showingUpdatePromptInAppUpdate) {
+    // Full screen для InAppUpdate стиля
 }
 ```
 
@@ -248,7 +248,7 @@ if let state = updateState {
 Попап обновления с двумя стилями:
 
 - **Native** — Модальное окно в стиле iOS Alert
-- **Olimp** — Полноэкранный стиль
+- **InAppUpdate** — Полноэкранный стиль
 
 ### VersionView
 

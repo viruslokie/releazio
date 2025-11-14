@@ -491,7 +491,7 @@ public struct Changelog: Codable, Identifiable {
 
 #### ReleazioUpdatePromptView
 
-Modal popup for update prompts with two styles: Native iOS Alert and Olimp.
+Modal popup for update prompts with two styles: Native iOS Alert and InAppUpdate.
 
 ```swift
 public struct ReleazioUpdatePromptView: View {
@@ -510,7 +510,7 @@ public struct ReleazioUpdatePromptView: View {
 
 **Parameters:**
 - `updateState`: `UpdateState` from `checkUpdates()`
-- `style`: `.native` or `.olimp` (default: `.default` which is `.native`)
+- `style`: `.native` or `.inAppUpdate` (default: `.default` which is `.native`)
 - `customColors`: Optional custom colors for buttons and text (see `UIComponentColors`)
 - `customStrings`: Optional custom localization strings (see `UILocalizationStrings`)
 - `onUpdate`: Callback when user taps "Update" button

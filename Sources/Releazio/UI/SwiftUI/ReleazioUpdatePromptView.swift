@@ -9,7 +9,7 @@ import SwiftUI
 
 /// SwiftUI view for Releazio update prompt
 /// Supports update types 2 (popup) and 3 (popup force)
-/// Supports two styles: Olimp and Native iOS Alert
+/// Supports two styles: InAppUpdate and Native iOS Alert
 public struct ReleazioUpdatePromptView: View {
     
     // MARK: - Properties
@@ -87,8 +87,8 @@ public struct ReleazioUpdatePromptView: View {
     public var body: some View {
         let effectiveTheme = UpdatePromptTheme(style: theme.style, colorScheme: systemColorScheme)
         
-        if theme.style == .olimp {
-            olimpStyleView(theme: effectiveTheme)
+        if theme.style == .inAppUpdate {
+            inAppUpdateStyleView(theme: effectiveTheme)
         } else {
             nativeStyleView(theme: effectiveTheme)
         }
@@ -184,9 +184,9 @@ public struct ReleazioUpdatePromptView: View {
         }
     }
     
-    // MARK: - Olimp Style (Full Screen)
+    // MARK: - InAppUpdate Style (Full Screen)
     
-    private func olimpStyleView(theme: UpdatePromptTheme) -> some View {
+    private func inAppUpdateStyleView(theme: UpdatePromptTheme) -> some View {
         VStack(spacing: 0) {
             // Red header
             HStack {

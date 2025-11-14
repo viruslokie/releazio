@@ -11,7 +11,7 @@ import Releazio
 struct ContentView: View {
     @State private var showingChangelog = false
     @State private var showingUpdatePromptNative = false
-    @State private var showingUpdatePromptOlimp = false
+    @State private var showingUpdatePromptInAppUpdate = false
     @State private var updateState: UpdateState?
     @State private var changelog: Changelog?
     @State private var isLoading = false
@@ -93,22 +93,22 @@ struct ContentView: View {
                     )
                 }
             }
-            .fullScreenCover(isPresented: $showingUpdatePromptOlimp) {
+            .fullScreenCover(isPresented: $showingUpdatePromptInAppUpdate) {
                 if let state = updateState {
                     ReleazioUpdatePromptView(
                         updateState: state,
-                        style: .olimp,
+                        style: .inAppUpdate,
                         onUpdate: {
                             // SDK предоставляет удобный метод для открытия App Store
                             Releazio.shared.openAppStore(updateState: state)
-                            showingUpdatePromptOlimp = false
+                            showingUpdatePromptInAppUpdate = false
                         },
                         onSkip: { remaining in
                             print("Skipped, remaining: \(remaining)")
-                            showingUpdatePromptOlimp = false
+                            showingUpdatePromptInAppUpdate = false
                         },
                         onClose: {
-                            showingUpdatePromptOlimp = false
+                            showingUpdatePromptInAppUpdate = false
                         },
                         onInfoTap: {
                             // SDK предоставляет удобный метод для открытия поста
@@ -202,11 +202,11 @@ struct ContentView: View {
                         }
                         
                         ActionButton(
-                            title: "Show Olimp Style",
+                            title: "Show InAppUpdate Style",
                             icon: "paintbrush.fill",
                             color: .orange
                         ) {
-                            showingUpdatePromptOlimp = true
+                            showingUpdatePromptInAppUpdate = true
                         }
                     }
                 }

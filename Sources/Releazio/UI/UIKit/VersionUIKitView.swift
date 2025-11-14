@@ -168,7 +168,7 @@ public class VersionUIKitView: UIView {
         if let customColor = customColors?.updateButtonColor {
             updateButton.backgroundColor = customColor
         } else {
-            // Default Olimp yellow
+            // Default InAppUpdate yellow
             updateButton.backgroundColor = UIColor(red: 1.0, green: 0.84, blue: 0.0, alpha: 1.0)
         }
         

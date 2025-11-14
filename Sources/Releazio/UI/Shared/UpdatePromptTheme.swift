@@ -12,7 +12,7 @@ import UIKit
 
 /// Update prompt style
 public enum UpdatePromptStyle {
-    case olimp
+    case inAppUpdate
     case native
     
     /// Default style
@@ -31,9 +31,9 @@ public struct UpdatePromptTheme {
     /// Background color
     public var backgroundColor: Color {
         switch (style, colorScheme) {
-        case (.olimp, .dark):
+        case (.inAppUpdate, .dark):
             return Color(red: 0.1, green: 0.1, blue: 0.1)
-        case (.olimp, _):
+        case (.inAppUpdate, _):
             return .white
         case (.native, .dark):
             return Color(white: 0.0)
@@ -42,11 +42,11 @@ public struct UpdatePromptTheme {
         }
     }
     
-    /// Header background color (for Olimp style)
+    /// Header background color (for InAppUpdate style)
     public var headerBackgroundColor: Color {
         switch style {
-        case .olimp:
-            return Color(red: 0.84, green: 0.16, blue: 0.18) // Olimp red
+        case .inAppUpdate:
+            return Color(red: 0.84, green: 0.16, blue: 0.18) // InAppUpdate red
         case .native:
             return colorScheme == .dark ? Color(white: 0.0) : Color(white: 1.0)
         }
@@ -55,7 +55,7 @@ public struct UpdatePromptTheme {
     /// Header text color
     public var headerTextColor: Color {
         switch style {
-        case .olimp:
+        case .inAppUpdate:
             return .white
         case .native:
             return .primary
@@ -65,8 +65,8 @@ public struct UpdatePromptTheme {
     /// Primary button color
     public var primaryButtonColor: Color {
         switch style {
-        case .olimp:
-            return Color(red: 1.0, green: 0.84, blue: 0.0) // Olimp yellow
+        case .inAppUpdate:
+            return Color(red: 1.0, green: 0.84, blue: 0.0) // InAppUpdate yellow
         case .native:
             return .blue
         }
@@ -75,7 +75,7 @@ public struct UpdatePromptTheme {
     /// Primary button text color
     public var primaryButtonTextColor: Color {
         switch style {
-        case .olimp:
+        case .inAppUpdate:
             return .black
         case .native:
             return .white
@@ -125,7 +125,7 @@ public struct UpdatePromptTheme {
     /// Close button color
     public var closeButtonColor: Color {
         switch (style, colorScheme) {
-        case (.olimp, _):
+        case (.inAppUpdate, _):
             return .white
         case (.native, .dark):
             return .white
@@ -142,7 +142,7 @@ public struct UpdatePromptTheme {
     
     /// Initialize theme
     /// - Parameters:
-    ///   - style: Update prompt style (Olimp or Native)
+    ///   - style: Update prompt style (InAppUpdate or Native)
     ///   - colorScheme: Color scheme (light or dark)
     public init(style: UpdatePromptStyle = .default, colorScheme: ColorScheme = .light) {
         self.style = style
@@ -151,14 +151,14 @@ public struct UpdatePromptTheme {
     
     // MARK: - Factory Methods
     
-    /// Olimp light theme
-    public static var olimpLight: UpdatePromptTheme {
-        return UpdatePromptTheme(style: .olimp, colorScheme: .light)
+    /// InAppUpdate light theme
+    public static var inAppUpdateLight: UpdatePromptTheme {
+        return UpdatePromptTheme(style: .inAppUpdate, colorScheme: .light)
     }
     
-    /// Olimp dark theme
-    public static var olimpDark: UpdatePromptTheme {
-        return UpdatePromptTheme(style: .olimp, colorScheme: .dark)
+    /// InAppUpdate dark theme
+    public static var inAppUpdateDark: UpdatePromptTheme {
+        return UpdatePromptTheme(style: .inAppUpdate, colorScheme: .dark)
     }
     
     /// Native light theme
@@ -181,9 +181,9 @@ public struct UpdatePromptUIKitTheme {
     
     public var backgroundColor: UIColor {
         switch (style, colorScheme) {
-        case (.olimp, .dark):
+        case (.inAppUpdate, .dark):
             return UIColor(red: 0.1, green: 0.1, blue: 0.1, alpha: 1.0)
-        case (.olimp, _):
+        case (.inAppUpdate, _):
             return .white
         case (.native, _):
             return .systemBackground
@@ -192,8 +192,8 @@ public struct UpdatePromptUIKitTheme {
     
     public var headerBackgroundColor: UIColor {
         switch style {
-        case .olimp:
-            return UIColor(red: 0.84, green: 0.16, blue: 0.18, alpha: 1.0) // Olimp red
+        case .inAppUpdate:
+            return UIColor(red: 0.84, green: 0.16, blue: 0.18, alpha: 1.0) // InAppUpdate red
         case .native:
             return .systemBackground
         }
@@ -201,7 +201,7 @@ public struct UpdatePromptUIKitTheme {
     
     public var headerTextColor: UIColor {
         switch style {
-        case .olimp:
+        case .inAppUpdate:
             return .white
         case .native:
             return .label
@@ -210,8 +210,8 @@ public struct UpdatePromptUIKitTheme {
     
     public var primaryButtonColor: UIColor {
         switch style {
-        case .olimp:
-            return UIColor(red: 1.0, green: 0.84, blue: 0.0, alpha: 1.0) // Olimp yellow
+        case .inAppUpdate:
+            return UIColor(red: 1.0, green: 0.84, blue: 0.0, alpha: 1.0) // InAppUpdate yellow
         case .native:
             return .systemBlue
         }
@@ -219,7 +219,7 @@ public struct UpdatePromptUIKitTheme {
     
     public var primaryButtonTextColor: UIColor {
         switch style {
-        case .olimp:
+        case .inAppUpdate:
             return .black
         case .native:
             return .white
@@ -264,7 +264,7 @@ public struct UpdatePromptUIKitTheme {
     
     public var closeButtonColor: UIColor {
         switch (style, colorScheme) {
-        case (.olimp, _):
+        case (.inAppUpdate, _):
             return .white
         case (.native, .dark):
             return .white
@@ -280,12 +280,12 @@ public struct UpdatePromptUIKitTheme {
         self.colorScheme = colorScheme
     }
     
-    public static var olimpLight: UpdatePromptUIKitTheme {
-        return UpdatePromptUIKitTheme(style: .olimp, colorScheme: .light)
+    public static var inAppUpdateLight: UpdatePromptUIKitTheme {
+        return UpdatePromptUIKitTheme(style: .inAppUpdate, colorScheme: .light)
     }
     
-    public static var olimpDark: UpdatePromptUIKitTheme {
-        return UpdatePromptUIKitTheme(style: .olimp, colorScheme: .dark)
+    public static var inAppUpdateDark: UpdatePromptUIKitTheme {
+        return UpdatePromptUIKitTheme(style: .inAppUpdate, colorScheme: .dark)
     }
     
     public static var nativeLight: UpdatePromptUIKitTheme {

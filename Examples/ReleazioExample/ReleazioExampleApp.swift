@@ -27,7 +27,7 @@ struct ReleazioExampleApp: App {
     // MARK: - Private Methods
 
     private func configureReleazioSDK() {
-        let apiKey = "ngqOJgnrvwFqSvVyqUOhxCvnRHisKkoiuI/PycYjiGc="
+        let apiKey = "Your API key here"
 
         // Create configuration
         let configuration = ReleazioConfiguration(

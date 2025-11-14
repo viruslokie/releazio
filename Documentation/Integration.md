@@ -555,12 +555,12 @@ ReleazioUpdatePromptView(
 }
 ```
 
-#### Olimp Style (Full Screen)
+#### InAppUpdate Style (Full Screen)
 
 ```swift
 ReleazioUpdatePromptView(
     updateState: updateState,
-    style: .olimp,
+    style: .inAppUpdate,
     onUpdate: {
         Releazio.shared.openAppStore(updateState: updateState)
     }

@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.3] - 2025-01-XX
+
+### Changed
+- Renamed update prompt style from "Olimp" to "InAppUpdate" for better clarity
+- Updated all documentation and examples to reflect the new naming
+- Updated Example app API key placeholder to prevent accidental commits
+
+### Fixed
+- Security: Removed hardcoded API key from Example app
+
+## [1.0.0] - 2025-10-05
+
 ### Added
 - Initial release of Releazio iOS SDK
 - Core SDK functionality with configuration management

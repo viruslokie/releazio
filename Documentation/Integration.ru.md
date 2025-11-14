@@ -555,12 +555,12 @@ class ViewController: UIViewController {
 }
 ```
 
-#### Olimp Style (Полноэкранный)
+#### InAppUpdate Style (Полноэкранный)
 
 ```swift
 ReleazioUpdatePromptView(
     updateState: updateState,
-    style: .olimp,
+    style: .inAppUpdate,
     onUpdate: {
         Releazio.shared.openAppStore(updateState: updateState)
     }

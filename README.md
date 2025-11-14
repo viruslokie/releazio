@@ -112,12 +112,12 @@ SDK поддерживает 4 типа обновлений в соответс
 ### SwiftUI
 
 #### ReleazioUpdatePromptView
-Попап для обновлений с поддержкой двух стилей: Native iOS Alert и Olimp.
+Попап для обновлений с поддержкой двух стилей: Native iOS Alert и InAppUpdate.
 
 ```swift
 ReleazioUpdatePromptView(
     updateState: updateState,
-    style: .native, // или .olimp
+    style: .native, // или .inAppUpdate
     locale: "ru",
     onUpdate: {
         Releazio.shared.openAppStore(updateState: updateState)
