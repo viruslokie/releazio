@@ -54,7 +54,35 @@ public class NetworkManager: NetworkManagerProtocol {
     /// - Returns: Configuration response
     /// - Throws: ReleazioError
     public func getConfig() async throws -> ConfigResponse {
-        let endpoint = APIEndpoints.getConfig()
+        // Collect all parameters from Bundle and system
+        let channel = "appstore" // iOS always uses App Store
+        let appId = Bundle.main.bundleIdentifier
+        let appVersionCode = Bundle.main.buildVersion
+        let appVersionName = Bundle.main.appVersion?.versionString
+        let phoneLocaleCountry = Locale.current.regionCode
+        let phoneLocaleLanguage = Locale.current.languageCode
+        let osVersionCode = ProcessInfo.processInfo.operatingSystemVersion.majorVersion
+        let deviceManufacturer = "Apple"
+        let deviceBrand = "Apple"
+        
+        #if canImport(UIKit)
+        let deviceModel = UIDevice.current.model
+        #else
+        let deviceModel: String? = nil
+        #endif
+        
+        let endpoint = APIEndpoints.getConfig(
+            channel: channel,
+            appId: appId,
+            appVersionCode: appVersionCode,
+            appVersionName: appVersionName,
+            phoneLocaleCountry: phoneLocaleCountry,
+            phoneLocaleLanguage: phoneLocaleLanguage,
+            osVersionCode: osVersionCode,
+            deviceManufacturer: deviceManufacturer,
+            deviceBrand: deviceBrand,
+            deviceModel: deviceModel
+        )
 
         do {
             let request = APIRequest.get(
@@ -234,16 +262,10 @@ public class NetworkManager: NetworkManagerProtocol {
     // MARK: - Private Methods
     
     /// Get default headers for all requests
-    /// - Returns: Default headers dictionary
+    /// - Returns: Default headers dictionary (only Authorization header)
     private func defaultHeaders() -> [String: String] {
         var headers: [String: String] = [
-            "Accept": "application/json",
-            "User-Agent": "Releazio-iOS-SDK/1.0.0",
-            "X-SDK-Version": "1.0.0",
-            "X-Platform": "iOS",
-            "X-OS-Version": ProcessInfo.processInfo.operatingSystemVersionString,
-            "X-App-Build": Bundle.main.buildVersion ?? "unknown",
-            "X-Application-ID": Bundle.main.bundleIdentifier ?? "unknown"
+            "Accept": "application/json"
         ]
 
         // Add API key if available

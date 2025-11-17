@@ -18,9 +18,65 @@ public enum APIEndpoints {
     // MARK: - Main Endpoint
 
     /// Get application configuration and releases
-    /// - Returns: Endpoint URL
-    public static func getConfig() -> URL {
-        return baseURL
+    /// - Parameters:
+    ///   - channel: Distribution channel (e.g., "appstore")
+    ///   - appId: Application bundle identifier
+    ///   - appVersionCode: Application build version (CFBundleVersion)
+    ///   - appVersionName: Application version name (CFBundleShortVersionString)
+    ///   - phoneLocaleCountry: User's locale country code
+    ///   - phoneLocaleLanguage: User's locale language code
+    ///   - osVersionCode: OS version code (major version number)
+    ///   - deviceManufacturer: Device manufacturer
+    ///   - deviceBrand: Device brand
+    ///   - deviceModel: Device model
+    /// - Returns: Endpoint URL with query parameters
+    public static func getConfig(
+        channel: String,
+        appId: String?,
+        appVersionCode: String?,
+        appVersionName: String?,
+        phoneLocaleCountry: String?,
+        phoneLocaleLanguage: String?,
+        osVersionCode: Int?,
+        deviceManufacturer: String,
+        deviceBrand: String,
+        deviceModel: String?
+    ) -> URL {
+        var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false)!
+        
+        var queryItems: [URLQueryItem] = []
+        
+        // Required parameters
+        queryItems.append(URLQueryItem(name: "channel", value: channel))
+        
+        // Optional parameters - only add if not nil
+        if let appId = appId {
+            queryItems.append(URLQueryItem(name: "app_id", value: appId))
+        }
+        if let appVersionCode = appVersionCode {
+            queryItems.append(URLQueryItem(name: "app_version_code", value: appVersionCode))
+        }
+        if let appVersionName = appVersionName {
+            queryItems.append(URLQueryItem(name: "app_version_name", value: appVersionName))
+        }
+        if let phoneLocaleCountry = phoneLocaleCountry {
+            queryItems.append(URLQueryItem(name: "phone_locale_country", value: phoneLocaleCountry))
+        }
+        if let phoneLocaleLanguage = phoneLocaleLanguage {
+            queryItems.append(URLQueryItem(name: "phone_locale_language", value: phoneLocaleLanguage))
+        }
+        if let osVersionCode = osVersionCode {
+            queryItems.append(URLQueryItem(name: "os_version_code", value: String(osVersionCode)))
+        }
+        queryItems.append(URLQueryItem(name: "device_manufacturer", value: deviceManufacturer))
+        queryItems.append(URLQueryItem(name: "device_brand", value: deviceBrand))
+        if let deviceModel = deviceModel {
+            queryItems.append(URLQueryItem(name: "device_model", value: deviceModel))
+        }
+        
+        components.queryItems = queryItems
+        
+        return components.url ?? baseURL
     }
 }
 

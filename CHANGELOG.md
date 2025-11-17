@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.4] - 2025-01-XX
+
+### Changed
+- Migrated getConfig API parameters from HTTP headers to URL query parameters
+- All device and app information now passed as query parameters instead of headers
+- Removed custom headers (X-App-Build, X-Application-ID, X-OS-Version, etc.) from requests
+- Only Authorization header remains for API key authentication
+
+### Technical Details
+- Parameters now passed in URL: channel, app_id, app_version_code, app_version_name, phone_locale_country, phone_locale_language, os_version_code, device_manufacturer, device_brand, device_model
+- This change aligns with backend API requirements and Swagger documentation
+
 ## [1.0.3] - 2025-01-XX
 
 ### Changed
