@@ -121,7 +121,7 @@ SDK поддерживает 4 типа обновлений в соответс
 ```swift
 ReleazioUpdatePromptView(
     updateState: updateState,
-    style: .native, // или .inAppUpdate
+    style: .native
     locale: "ru",
     onUpdate: {
         Releazio.shared.openAppStore(updateState: updateState)
@@ -139,12 +139,45 @@ ReleazioUpdatePromptView(
 ```
 
 #### VersionView
-Компонент для отображения версии приложения с кнопкой обновления.
+Компонент для отображения версии приложения с кнопкой обновления (Type 1 - компонент внизу экрана).
 
+Этот компонент отображает:
+- Текст версии (например, "Версия 1.2") с опциональной желтой точкой, когда пост не прочитан
+- Кнопку обновления (черная по умолчанию), когда доступно обновление
+
+**Возможности:**
+- Желтая точка появляется, когда есть непрочитанный пост (postUrl существует и не был открыт)
+- Нажатие на текст версии открывает URL поста (post_url, если доступен, иначе posts_url)
+- Кнопка обновления открывает URL App Store (app_url)
+- Полностью настраиваемые цвета и строки
+
+**Пример SwiftUI:**
 ```swift
 VersionView(
     updateState: updateState,
-    locale: "ru",
+    onUpdateTap: {
+        Releazio.shared.openAppStore(updateState: updateState)
+    },
+    onVersionTap: {
+        // Опционально: кастомный обработчик для нажатия на версию
+        // По умолчанию: открывает badgeURL (post_url или posts_url)
+        Releazio.shared.openPostURL(updateState: updateState)
+    }
+)
+```
+
+**С кастомными цветами:**
+```swift
+let customColors = UIComponentColors(
+    updateButtonColor: .black,
+    updateButtonTextColor: .white,
+    versionBackgroundColor: .systemGray6,
+    versionTextColor: .label
+)
+
+VersionView(
+    updateState: updateState,
+    customColors: customColors,
     onUpdateTap: {
         Releazio.shared.openAppStore(updateState: updateState)
     }
@@ -176,7 +209,7 @@ ChangelogView(changelog: changelog)
 ```swift
 let viewController = ReleazioUpdatePromptViewController(
     updateState: updateState,
-    style: .native, // или .inAppUpdate
+    style: .native
     onUpdate: {
         Releazio.shared.openAppStore(updateState: updateState)
     },
@@ -195,15 +228,27 @@ present(viewController, animated: true)
 ```
 
 #### VersionUIKitView
+UIKit компонент для отображения версии приложения с кнопкой обновления (Type 1 - компонент внизу экрана).
+
+**Возможности:**
+- Индикатор желтой точки, когда пост не прочитан
+- Нажимаемый лейбл версии открывает URL поста
+- Черная кнопка обновления по умолчанию
+- Полностью настраиваемый
 
 ```swift
 let versionView = VersionUIKitView(
-    updateState: updateState,
-    locale: "ru"
+    updateState: updateState
 )
 
 versionView.onUpdateTap = {
     Releazio.shared.openAppStore(updateState: updateState)
+}
+
+versionView.onVersionTap = {
+    // Опционально: кастомный обработчик для нажатия на версию
+    // По умолчанию: открывает badgeURL (post_url или posts_url)
+    Releazio.shared.openPostURL(updateState: updateState)
 }
 
 view.addSubview(versionView)

@@ -121,8 +121,6 @@ Update popup with support for two styles: Native iOS Alert and InAppUpdate.
 ```swift
 ReleazioUpdatePromptView(
     updateState: updateState,
-    style: .native, // or .inAppUpdate
-    locale: "en",
     onUpdate: {
         Releazio.shared.openAppStore(updateState: updateState)
     },
@@ -139,12 +137,45 @@ ReleazioUpdatePromptView(
 ```
 
 #### VersionView
-Component for displaying app version with update button.
+Component for displaying app version with update button (Type 1 - bottom of screen component).
 
+This component displays:
+- Version text (e.g., "Version 1.2") with optional yellow dot indicator when post is unread
+- Update button (black by default) when update is available
+
+**Features:**
+- Yellow dot appears when there's an unread post (postUrl exists and hasn't been opened)
+- Tapping version text opens post URL (post_url if available, otherwise posts_url)
+- Update button opens App Store URL (app_url)
+- Fully customizable colors and strings
+
+**SwiftUI Example:**
 ```swift
 VersionView(
     updateState: updateState,
-    locale: "en",
+    onUpdateTap: {
+        Releazio.shared.openAppStore(updateState: updateState)
+    },
+    onVersionTap: {
+        // Optional: custom handler for version tap
+        // Default: opens badgeURL (post_url or posts_url)
+        Releazio.shared.openPostURL(updateState: updateState)
+    }
+)
+```
+
+**With custom colors:**
+```swift
+let customColors = UIComponentColors(
+    updateButtonColor: .black,
+    updateButtonTextColor: .white,
+    versionBackgroundColor: .systemGray6,
+    versionTextColor: .label
+)
+
+VersionView(
+    updateState: updateState,
+    customColors: customColors,
     onUpdateTap: {
         Releazio.shared.openAppStore(updateState: updateState)
     }
@@ -176,7 +207,6 @@ ChangelogView(changelog: changelog)
 ```swift
 let viewController = ReleazioUpdatePromptViewController(
     updateState: updateState,
-    style: .native, // or .inAppUpdate
     onUpdate: {
         Releazio.shared.openAppStore(updateState: updateState)
     },
@@ -195,15 +225,27 @@ present(viewController, animated: true)
 ```
 
 #### VersionUIKitView
+UIKit component for displaying app version with update button (Type 1 - bottom of screen component).
+
+**Features:**
+- Yellow dot indicator when post is unread
+- Tappable version label opens post URL
+- Black update button by default
+- Fully customizable
 
 ```swift
 let versionView = VersionUIKitView(
-    updateState: updateState,
-    locale: "en"
+    updateState: updateState
 )
 
 versionView.onUpdateTap = {
     Releazio.shared.openAppStore(updateState: updateState)
+}
+
+versionView.onVersionTap = {
+    // Optional: custom handler for version tap
+    // Default: opens badgeURL (post_url or posts_url)
+    Releazio.shared.openPostURL(updateState: updateState)
 }
 
 view.addSubview(versionView)

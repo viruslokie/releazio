@@ -86,12 +86,7 @@ public struct ReleazioUpdatePromptView: View {
     @ViewBuilder
     public var body: some View {
         let effectiveTheme = UpdatePromptTheme(style: theme.style, colorScheme: systemColorScheme)
-        
-        if theme.style == .inAppUpdate {
-            inAppUpdateStyleView(theme: effectiveTheme)
-        } else {
-            nativeStyleView(theme: effectiveTheme)
-        }
+        nativeStyleView(theme: effectiveTheme)
     }
     
     // MARK: - Native iOS Alert Style
@@ -111,13 +106,28 @@ public struct ReleazioUpdatePromptView: View {
             VStack(spacing: 0) {
                 // Header
                 HStack {
+                    // Info button (if post URL exists) - слева
+                    if updateState.channelData.postUrl != nil {
+                        Button(action: {
+                            onInfoTap?()
+                        }) {
+                            Image(systemName: "questionmark.circle.fill")
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundColor(.gray)
+                                .frame(width: 24, height: 24)
+                        }
+                    }
+                    
+                    Spacer()
+                    
+                    // Title - по центру
                     Text(updateTitle)
                         .font(.system(size: 20, weight: .bold))
                         .foregroundColor(theme.textColor)
                     
                     Spacer()
                     
-                    // Close button (only for type 2)
+                    // Close button (only for type 2) - справа
                     if updateState.updateType == 2 {
                         Button(action: {
                             onClose?()
@@ -127,6 +137,10 @@ public struct ReleazioUpdatePromptView: View {
                                 .foregroundColor(theme.closeButtonColor)
                                 .frame(width: 24, height: 24)
                         }
+                    } else if updateState.channelData.postUrl == nil {
+                        // Spacer справа, если нет ни close button, ни info button
+                        Spacer()
+                            .frame(width: 24, height: 24)
                     }
                 }
                 .padding(.horizontal, 20)
@@ -147,10 +161,10 @@ public struct ReleazioUpdatePromptView: View {
                 }) {
                     Text(updateButtonText)
                         .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(updateButtonTextColor)
+                        .foregroundColor(updateButtonTextColor(theme: theme))
                         .frame(maxWidth: .infinity)
                         .frame(height: 50)
-                        .background(updateButtonColor)
+                        .background(updateButtonColor(theme: theme))
                         .cornerRadius(12)
                 }
                 .padding(.horizontal, 20)
@@ -181,93 +195,6 @@ public struct ReleazioUpdatePromptView: View {
             .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
             .padding(20)
         }
-    }
-    
-    // MARK: - InAppUpdate Style (Full Screen)
-    
-    private func inAppUpdateStyleView(theme: UpdatePromptTheme) -> some View {
-        // Full-screen content area
-        VStack(spacing: 0) {
-            // Header with safe area
-            VStack(spacing: 0) {
-                HStack {
-                    // Close button (only for type 2)
-                    if updateState.updateType == 2 {
-                        Button(action: {
-                            onClose?()
-                        }) {
-                            Image(systemName: "xmark")
-                                .font(.system(size: 20, weight: .medium))
-                                .foregroundColor(theme.closeButtonColor)
-                                .frame(width: 24, height: 24)
-                        }
-                    }
-                    
-                    Spacer()
-                }
-                .padding(.horizontal, 20)
-                .padding(.top, 20)
-                .padding(.bottom, 16)
-            }
-            .background(theme.headerBackgroundColor)
-            
-            Spacer()
-            
-            VStack(alignment: .center, spacing: 20) {
-                Text(updateTitle)
-                    .font(.system(size: 20, weight: .bold))
-                    .foregroundColor(theme.textColor)
-                    .multilineTextAlignment(.center)
-                
-                // Message
-                Text(updateState.channelData.updateMessage.isEmpty ? updateMessage : updateState.channelData.updateMessage)
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(theme.secondaryTextColor)
-                    .frame(maxWidth: 400)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 24)
-            }
-            
-            // Buttons at bottom
-            VStack(spacing: 12) {
-                // Update button
-                Button(action: {
-                    onUpdate?()
-                }) {
-                    Text(updateButtonText)
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(updateButtonTextColor)
-                        .frame(maxWidth: 300)
-                        .frame(height: 56)
-                        .background(updateButtonColor)
-                        .cornerRadius(14)
-                }
-                
-                // Skip button (for type 3)
-                if updateState.updateType == 3 && remainingSkipAttempts > 0 {
-                    Button(action: {
-                        let newRemaining = remainingSkipAttempts - 1
-                        remainingSkipAttempts = newRemaining
-                        onSkip?(newRemaining)
-                        // "Skip" means close the popup
-                        onClose?()
-                    }) {
-                        Text(skipButtonText + " (\(remainingSkipAttempts))")
-                            .font(.system(size: 16, weight: .medium))
-                            .foregroundColor(theme.textColor.opacity(0.6))
-                            .frame(maxWidth: 300)
-                            .frame(height: 44)
-                    }
-                }
-            }
-            .padding(.horizontal, 40)
-            .padding(.bottom, 40)
-            
-            Spacer()
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(theme.backgroundColor)
     }
     
     // MARK: - Computed Properties for Custom Strings and Colors
@@ -303,7 +230,7 @@ public struct ReleazioUpdatePromptView: View {
         return localization.skipRemainingText(count: remainingSkipAttempts)
     }
     
-    private var updateButtonColor: Color {
+    private func updateButtonColor(theme: UpdatePromptTheme) -> Color {
         if let customColor = customColors?.updateButtonColor {
             #if canImport(UIKit)
             return Color(customColor)
@@ -314,7 +241,7 @@ public struct ReleazioUpdatePromptView: View {
         return theme.primaryButtonColor
     }
     
-    private var updateButtonTextColor: Color {
+    private func updateButtonTextColor(theme: UpdatePromptTheme) -> Color {
         if let customColor = customColors?.updateButtonTextColor {
             #if canImport(UIKit)
             return Color(customColor)
@@ -325,7 +252,7 @@ public struct ReleazioUpdatePromptView: View {
         return theme.primaryButtonTextColor
     }
     
-    private var linkColor: Color {
+    private func linkColor(theme: UpdatePromptTheme) -> Color {
         if let customColor = customColors?.linkColor {
             #if canImport(UIKit)
             return Color(customColor)

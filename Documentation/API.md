@@ -510,7 +510,7 @@ public struct ReleazioUpdatePromptView: View {
 
 **Parameters:**
 - `updateState`: `UpdateState` from `checkUpdates()`
-- `style`: `.native` or `.inAppUpdate` (default: `.default` which is `.native`)
+- `style`: `.native` (default: `.default` which is `.native`)
 - `customColors`: Optional custom colors for buttons and text (see `UIComponentColors`)
 - `customStrings`: Optional custom localization strings (see `UILocalizationStrings`)
 - `onUpdate`: Callback when user taps "Update" button
@@ -556,7 +556,17 @@ ReleazioUpdatePromptView(
 
 #### VersionView
 
-Component for displaying app version with optional update button.
+Component for displaying app version with update button (Type 1 - bottom of screen component).
+
+This component displays:
+- Version text (e.g., "Version 1.2") with optional yellow dot indicator when post is unread
+- Update button (black by default) when update is available
+
+**Features:**
+- Yellow dot appears when there's an unread post (postUrl exists and hasn't been opened)
+- Tapping version text opens post URL (post_url if available, otherwise posts_url)
+- Update button opens App Store URL (app_url)
+- Fully customizable colors and strings
 
 ```swift
 public struct VersionView: View {
@@ -564,7 +574,8 @@ public struct VersionView: View {
         updateState: UpdateState,
         customColors: UIComponentColors? = nil,
         customStrings: UILocalizationStrings? = nil,
-        onUpdateTap: (() -> Void)? = nil
+        onUpdateTap: (() -> Void)? = nil,
+        onVersionTap: (() -> Void)? = nil
     )
     
     // Or initialize with individual parameters
@@ -573,7 +584,8 @@ public struct VersionView: View {
         isUpdateAvailable: Bool = false,
         customColors: UIComponentColors? = nil,
         customStrings: UILocalizationStrings? = nil,
-        onUpdateTap: (() -> Void)? = nil
+        onUpdateTap: (() -> Void)? = nil,
+        onVersionTap: (() -> Void)? = nil
     )
 }
 ```
@@ -583,6 +595,7 @@ public struct VersionView: View {
 - `customColors`: Optional custom colors (supports `updateButtonColor`, `updateButtonTextColor`, `versionBackgroundColor`, `versionTextColor`)
 - `customStrings`: Optional custom strings (supports `versionText`, `updateButtonText`)
 - `onUpdateTap`: Callback when update button is tapped
+- `onVersionTap`: Optional callback when version text is tapped (default: opens badgeURL)
 
 **Note:** Locale is automatically detected from system settings.
 

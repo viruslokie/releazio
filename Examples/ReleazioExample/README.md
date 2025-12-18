@@ -173,7 +173,7 @@ ReleazioUpdatePromptView(
 ```swift
 ReleazioUpdatePromptView(
     updateState: state,
-    style: .inAppUpdate,
+    style: .native,
     locale: "ru",
     onUpdate: {
         Releazio.shared.openAppStore(updateState: state)

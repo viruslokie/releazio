@@ -11,11 +11,13 @@ import Releazio
 struct ContentView: View {
     @State private var showingChangelog = false
     @State private var showingUpdatePromptNative = false
-    @State private var showingUpdatePromptInAppUpdate = false
     @State private var updateState: UpdateState?
     @State private var changelog: Changelog?
     @State private var isLoading = false
     @State private var isDarkMode = false
+    @State private var testPopupState: UpdateState?
+    @State private var testPopupStyle: UpdatePromptStyle = .native
+    @State private var showingTestPopup = false
 
     var body: some View {
         NavigationView {
@@ -27,6 +29,9 @@ struct ContentView: View {
 
                         // Quick Actions
                         quickActionsView
+
+                        // Test Popups Section
+                        testPopupsView
 
                         // Update Status
                         if let state = updateState {
@@ -69,55 +74,32 @@ struct ContentView: View {
                     }
                 }
             }
-            .sheet(isPresented: $showingUpdatePromptNative) {
-                if let state = updateState {
-                    ReleazioUpdatePromptView(
-                        updateState: state,
-                        style: .native,
-                        onUpdate: {
-                            // SDK предоставляет удобный метод для открытия App Store
-                            Releazio.shared.openAppStore(updateState: state)
-                            showingUpdatePromptNative = false
-                        },
-                        onSkip: { remaining in
-                            print("Skipped, remaining: \(remaining)")
-                            showingUpdatePromptNative = false
-                        },
-                        onClose: {
-                            showingUpdatePromptNative = false
-                        },
-                        onInfoTap: {
-                            // SDK предоставляет удобный метод для открытия поста
-                            Releazio.shared.openPostURL(updateState: state)
-                        }
-                    )
+            .overlay(
+                Group {
+                    if showingUpdatePromptNative, let state = updateState {
+                        ReleazioUpdatePromptView(
+                            updateState: state,
+                            style: .native,
+                            onUpdate: {
+                                // SDK предоставляет удобный метод для открытия App Store
+                                Releazio.shared.openAppStore(updateState: state)
+                                showingUpdatePromptNative = false
+                            },
+                            onSkip: { remaining in
+                                print("Skipped, remaining: \(remaining)")
+                                showingUpdatePromptNative = false
+                            },
+                            onClose: {
+                                showingUpdatePromptNative = false
+                            },
+                            onInfoTap: {
+                                // SDK предоставляет удобный метод для открытия поста
+                                Releazio.shared.openPostURL(updateState: state)
+                            }
+                        )
+                    }
                 }
-            }
-            .fullScreenCover(isPresented: $showingUpdatePromptInAppUpdate) {
-                if let state = updateState {
-                    ReleazioUpdatePromptView(
-                        updateState: state,
-                        style: .inAppUpdate,
-                        onUpdate: {
-                            // SDK предоставляет удобный метод для открытия App Store
-                            Releazio.shared.openAppStore(updateState: state)
-                            showingUpdatePromptInAppUpdate = false
-                        },
-                        onSkip: { remaining in
-                            print("Skipped, remaining: \(remaining)")
-                            showingUpdatePromptInAppUpdate = false
-                        },
-                        onClose: {
-                            showingUpdatePromptInAppUpdate = false
-                        },
-                        onInfoTap: {
-                            // SDK предоставляет удобный метод для открытия поста
-                            Releazio.shared.openPostURL(updateState: state)
-                        }
-                    )
-                    .preferredColorScheme(isDarkMode ? .dark : .light)
-                }
-            }
+            )
             .overlay(
                 Group {
                     if isLoading {
@@ -127,6 +109,33 @@ struct ContentView: View {
                             ProgressView()
                                 .scaleEffect(1.5)
                         }
+                    }
+                }
+            )
+            .overlay(
+                Group {
+                    if showingTestPopup, let state = testPopupState {
+                        ReleazioUpdatePromptView(
+                            updateState: state,
+                            style: testPopupStyle,
+                            onUpdate: {
+                                print("Update tapped for type \(state.updateType)")
+                                showingTestPopup = false
+                            },
+                            onSkip: { remaining in
+                                print("Skipped, remaining: \(remaining)")
+                                showingTestPopup = false
+                            },
+                            onClose: {
+                                print("Closed popup for type \(state.updateType)")
+                                showingTestPopup = false
+                            },
+                            onInfoTap: {
+                                print("Info tapped")
+                            }
+                        )
+                        .preferredColorScheme(isDarkMode ? .dark : .light)
+                        .id(state.updateType) // Force view recreation on type change
                     }
                 }
             )
@@ -201,13 +210,6 @@ struct ContentView: View {
                             showingUpdatePromptNative = true
                         }
                         
-                        ActionButton(
-                            title: "Show InAppUpdate Style",
-                            icon: "paintbrush.fill",
-                            color: .orange
-                        ) {
-                            showingUpdatePromptInAppUpdate = true
-                        }
                     }
                 }
                 
@@ -220,6 +222,92 @@ struct ContentView: View {
                 }
             }
         }
+    }
+    
+    // MARK: - Test Popups View
+    
+    private var testPopupsView: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Test Popups")
+                .font(.headline)
+                .fontWeight(.semibold)
+            
+            Text("Test different popup types")
+                .font(.caption)
+                .foregroundColor(.secondary)
+            
+            LazyVGrid(columns: [
+                GridItem(.flexible()),
+                GridItem(.flexible())
+            ], spacing: 12) {
+                // Type 2 - Native Style
+                ActionButton(
+                    title: "Type 2 (Native)",
+                    icon: "rectangle.and.arrow.up.right.and.arrow.down.left",
+                    color: .blue
+                ) {
+                    testPopupState = createTestUpdateState(type: 2)
+                    testPopupStyle = .native
+                    showingTestPopup = true
+                }
+                
+                // Type 3 - Native Style
+                ActionButton(
+                    title: "Type 3 (Native)",
+                    icon: "exclamationmark.triangle.fill",
+                    color: .red
+                ) {
+                    testPopupState = createTestUpdateState(type: 3, skipAttempts: 3)
+                    testPopupStyle = .native
+                    showingTestPopup = true
+                }
+            }
+        }
+        .padding()
+        .background(Color(.secondarySystemBackground))
+        .cornerRadius(12)
+    }
+    
+    // MARK: - Helper Functions
+    
+    private func createTestUpdateState(type: Int, skipAttempts: Int = 0) -> UpdateState {
+        let currentVersion = getCurrentVersion()
+        
+        // Create ChannelData via JSON decoding
+        let channelDataJSON: [String: Any] = [
+            "channel": "appstore",
+            "app_version_code": "230",
+            "app_version_name": "2.6.1",
+            "app_deeplink": "itms-apps://apps.apple.com/app/id123456789",
+            "channel_package_name": NSNull(),
+            "app_url": "https://apps.apple.com/app/id123456789",
+            "post_url": "https://example.com/post",
+            "posts_url": "https://example.com/posts",
+            "update_type": type,
+            "update_message": "Доступна новая версия приложения с улучшениями и исправлениями ошибок.",
+            "skip_attempts": skipAttempts,
+            "show_interval": 60
+        ]
+        
+        let jsonData = try! JSONSerialization.data(withJSONObject: channelDataJSON)
+        let decoder = JSONDecoder()
+        let channelData = try! decoder.decode(ChannelData.self, from: jsonData)
+        
+        return UpdateState(
+            updateType: type,
+            shouldShowBadge: type == 0,
+            shouldShowPopup: type == 2 || type == 3,
+            shouldShowUpdateButton: type == 1,
+            remainingSkipAttempts: skipAttempts,
+            channelData: channelData,
+            badgeURL: channelData.postUrl,
+            updateURL: channelData.appUrl,
+            currentVersion: "1",
+            latestVersion: "230",
+            currentVersionName: currentVersion,
+            latestVersionName: "2.6.1",
+            isUpdateAvailable: true
+        )
     }
     
     // Version Component внизу экрана

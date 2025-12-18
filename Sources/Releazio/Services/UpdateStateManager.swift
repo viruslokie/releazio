@@ -89,6 +89,13 @@ public class UpdateStateManager {
         storage.markPostAsOpened(postURL)
     }
     
+    /// Check if post was opened
+    /// - Parameter postURL: Post URL to check
+    /// - Returns: True if post was opened
+    public func isPostOpened(postURL: String) -> Bool {
+        return storage.isPostOpened(postURL)
+    }
+    
     /// Mark popup as shown (for type 2, 3)
     /// - Parameters:
     ///   - version: Version identifier
@@ -130,16 +137,7 @@ public class UpdateStateManager {
         channelData: ChannelData,
         isUpdateAvailable: Bool
     ) -> Bool {
-        // Badge only for type 0 (latest)
-        guard channelData.updateType == 0 else {
-            return false
-        }
-        
-        // Only show if update is available
-        guard isUpdateAvailable else {
-            return false
-        }
-        
+        // Badge for all types when post is unread (not just type 0)
         // Check if post was already opened
         if let postURL = channelData.postUrl {
             return !storage.isPostOpened(postURL)
@@ -222,10 +220,7 @@ public class UpdateStateManager {
     }
     
     private func getBadgeURL(channelData: ChannelData) -> String? {
-        guard channelData.updateType == 0 else {
-            return nil
-        }
-        
+        // Badge URL for all types when post exists (not just type 0)
         guard let postURL = channelData.postUrl else {
             return channelData.postsUrl
         }

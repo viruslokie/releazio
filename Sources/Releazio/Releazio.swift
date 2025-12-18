@@ -174,6 +174,13 @@ public class Releazio {
         updateStateManager.markPostAsOpened(postURL: postURL)
     }
     
+    /// Check if post was opened
+    /// - Parameter postURL: Post URL to check
+    /// - Returns: True if post was opened
+    public func isPostOpened(postURL: String) -> Bool {
+        return updateStateManager.isPostOpened(postURL: postURL)
+    }
+    
     /// Mark popup as shown (for types 2, 3)
     /// - Parameters:
     ///   - version: Version identifier

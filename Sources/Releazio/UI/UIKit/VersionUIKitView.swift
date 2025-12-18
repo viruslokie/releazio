@@ -14,11 +14,20 @@ public class VersionUIKitView: UIView {
     
     // MARK: - Properties
     
+    /// Yellow dot view (for unread post)
+    private let yellowDotView: UIView
+    
     /// Version label
     private let versionLabel: UILabel
     
     /// Update button
     private let updateButton: UIButton
+    
+    /// Badge URL (post_url or posts_url) for version tap
+    private var badgeURL: String?
+    
+    /// Post URL from channel data
+    private var postUrl: String?
     
     /// Custom colors for component
     private let customColors: UIComponentColors?
@@ -31,6 +40,9 @@ public class VersionUIKitView: UIView {
     
     /// Update button action
     public var onUpdateTap: (() -> Void)?
+    
+    /// Version tap action (opens post URL)
+    public var onVersionTap: (() -> Void)?
     
     /// Color scheme
     public var colorScheme: UIUserInterfaceStyle = .light {
@@ -57,6 +69,8 @@ public class VersionUIKitView: UIView {
         self.init(
             version: updateState.currentVersionName,
             isUpdateAvailable: updateState.isUpdateAvailable,
+            badgeURL: updateState.badgeURL,
+            postUrl: updateState.channelData.postUrl,
             customColors: customColors,
             customStrings: customStrings,
             frame: frame
@@ -67,18 +81,25 @@ public class VersionUIKitView: UIView {
     /// - Parameters:
     ///   - version: Current app version string
     ///   - isUpdateAvailable: Whether update is available
+    ///   - badgeURL: Badge URL for version tap (optional)
+    ///   - postUrl: Post URL from channel data (optional)
     ///   - customColors: Custom colors for buttons and text (optional)
     ///   - customStrings: Custom localization strings (optional)
     ///   - frame: View frame
     public init(
         version: String,
         isUpdateAvailable: Bool = false,
+        badgeURL: String? = nil,
+        postUrl: String? = nil,
         customColors: UIComponentColors? = nil,
         customStrings: UILocalizationStrings? = nil,
         frame: CGRect = .zero
     ) {
+        self.yellowDotView = UIView()
         self.versionLabel = UILabel()
         self.updateButton = UIButton(type: .system)
+        self.badgeURL = badgeURL
+        self.postUrl = postUrl
         self.customColors = customColors
         self.customStrings = customStrings
         // Auto-detect locale from system
@@ -98,15 +119,25 @@ public class VersionUIKitView: UIView {
     // MARK: - Setup
     
     private func setupUI(version: String, isUpdateAvailable: Bool) {
-        // Version label
+        // Yellow dot (for unread post)
+        yellowDotView.backgroundColor = .systemYellow
+        yellowDotView.layer.cornerRadius = 4
+        yellowDotView.translatesAutoresizingMaskIntoConstraints = false
+        yellowDotView.isHidden = !shouldShowYellowDot
+        
+        // Version label (tappable)
         let versionText = customStrings?.versionText ?? localization.versionText
         versionLabel.text = "\(versionText) \(version)"
         versionLabel.font = .systemFont(ofSize: 15, weight: .medium)
         versionLabel.textAlignment = .center
         versionLabel.translatesAutoresizingMaskIntoConstraints = false
-        
+        versionLabel.isUserInteractionEnabled = true
         versionLabel.layer.cornerRadius = 10
         versionLabel.clipsToBounds = true
+        
+        // Add tap gesture to version label
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(versionLabelTapped))
+        versionLabel.addGestureRecognizer(tapGesture)
         
         // Update button
         let buttonText = customStrings?.updateButtonText ?? localization.updateButtonText
@@ -117,26 +148,46 @@ public class VersionUIKitView: UIView {
         updateButton.isHidden = !isUpdateAvailable
         updateButton.addTarget(self, action: #selector(updateButtonTapped), for: .touchUpInside)
         
+        addSubview(yellowDotView)
         addSubview(versionLabel)
         addSubview(updateButton)
         
         updateColors()
     }
     
+    private var versionLabelLeadingConstraint: NSLayoutConstraint!
+    
     private func setupConstraints() {
-        NSLayoutConstraint.activate([
-            // Version label
-            versionLabel.leadingAnchor.constraint(equalTo: leadingAnchor),
-            versionLabel.topAnchor.constraint(equalTo: topAnchor),
-            versionLabel.bottomAnchor.constraint(equalTo: bottomAnchor),
-            versionLabel.heightAnchor.constraint(equalToConstant: 44),
-            
-            // Update button
-            updateButton.leadingAnchor.constraint(equalTo: versionLabel.trailingAnchor, constant: 12),
-            updateButton.trailingAnchor.constraint(equalTo: trailingAnchor),
-            updateButton.centerYAnchor.constraint(equalTo: versionLabel.centerYAnchor),
-            updateButton.heightAnchor.constraint(equalToConstant: 44)
-        ])
+        // Yellow dot
+        yellowDotView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        yellowDotView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+        yellowDotView.widthAnchor.constraint(equalToConstant: 8).isActive = true
+        yellowDotView.heightAnchor.constraint(equalToConstant: 8).isActive = true
+        
+        // Version label - use dynamic constraint
+        versionLabelLeadingConstraint = versionLabel.leadingAnchor.constraint(equalTo: leadingAnchor)
+        versionLabelLeadingConstraint.isActive = true
+        versionLabel.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        versionLabel.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        versionLabel.heightAnchor.constraint(equalToConstant: 44).isActive = true
+        
+        // Update button
+        updateButton.leadingAnchor.constraint(equalTo: versionLabel.trailingAnchor, constant: 12).isActive = true
+        updateButton.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        updateButton.centerYAnchor.constraint(equalTo: versionLabel.centerYAnchor).isActive = true
+        updateButton.heightAnchor.constraint(equalToConstant: 44).isActive = true
+        
+        updateConstraintsForYellowDot()
+    }
+    
+    private func updateConstraintsForYellowDot() {
+        versionLabelLeadingConstraint.isActive = false
+        if shouldShowYellowDot {
+            versionLabelLeadingConstraint = versionLabel.leadingAnchor.constraint(equalTo: yellowDotView.trailingAnchor, constant: 12)
+        } else {
+            versionLabelLeadingConstraint = versionLabel.leadingAnchor.constraint(equalTo: leadingAnchor)
+        }
+        versionLabelLeadingConstraint.isActive = true
     }
     
     private func updateColors() {
@@ -168,17 +219,27 @@ public class VersionUIKitView: UIView {
         if let customColor = customColors?.updateButtonColor {
             updateButton.backgroundColor = customColor
         } else {
-            // Default InAppUpdate yellow
-            updateButton.backgroundColor = UIColor(red: 1.0, green: 0.84, blue: 0.0, alpha: 1.0)
+            // Default black button
+            updateButton.backgroundColor = .black
         }
         
         // Update button text color
         if let customColor = customColors?.updateButtonTextColor {
             updateButton.setTitleColor(customColor, for: .normal)
         } else {
-            // Default black text on yellow button
-            updateButton.setTitleColor(.black, for: .normal)
+            // Default white text on black button
+            updateButton.setTitleColor(.white, for: .normal)
         }
+        
+        // Update yellow dot visibility and constraints
+        yellowDotView.isHidden = !shouldShowYellowDot
+        updateConstraintsForYellowDot()
+    }
+    
+    /// Whether to show yellow dot (post is unread)
+    private var shouldShowYellowDot: Bool {
+        // Show dot if postUrl exists and badgeURL equals postUrl (post not read)
+        return postUrl != nil && badgeURL == postUrl
     }
     
     // MARK: - Public Methods
@@ -197,13 +258,26 @@ public class VersionUIKitView: UIView {
     /// - Parameter updateState: Update state from checkUpdates()
     public func update(updateState: UpdateState) {
         // Show update button if update is available (for all types)
+        self.badgeURL = updateState.badgeURL
+        self.postUrl = updateState.channelData.postUrl
         update(version: updateState.currentVersionName, isUpdateAvailable: updateState.isUpdateAvailable)
+        updateColors() // Update yellow dot visibility
     }
     
     // MARK: - Actions
     
     @objc private func updateButtonTapped() {
         onUpdateTap?()
+    }
+    
+    @objc private func versionLabelTapped() {
+        if let customHandler = onVersionTap {
+            customHandler()
+        } else if let urlString = badgeURL, let url = URL(string: urlString) {
+            if UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url)
+            }
+        }
     }
 }
 

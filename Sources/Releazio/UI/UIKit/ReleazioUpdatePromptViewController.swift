@@ -90,7 +90,7 @@ public class ReleazioUpdatePromptViewController: UIViewController {
     private lazy var infoButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(systemName: "questionmark.circle.fill"), for: .normal)
-        button.tintColor = .systemBlue
+        button.tintColor = .gray
         button.addTarget(self, action: #selector(infoTapped), for: .touchUpInside)
         return button
     }()
@@ -199,11 +199,7 @@ public class ReleazioUpdatePromptViewController: UIViewController {
     // MARK: - Setup
     
     private func setupUI() {
-        if style == .inAppUpdate {
-            setupInAppUpdateStyle()
-        } else {
-            setupNativeStyle()
-        }
+        setupNativeStyle()
     }
     
     private func setupNativeStyle() {
@@ -224,13 +220,20 @@ public class ReleazioUpdatePromptViewController: UIViewController {
         view.addSubview(containerView)
         
         // Header
-        headerStackView.addArrangedSubview(titleLabel)
-        headerStackView.addArrangedSubview(UIView()) // Spacer
+        // Info button (if post URL exists) - слева
         if updateState.channelData.postUrl != nil {
             headerStackView.addArrangedSubview(infoButton)
         }
+        headerStackView.addArrangedSubview(UIView()) // Spacer
+        // Title - по центру
+        headerStackView.addArrangedSubview(titleLabel)
+        headerStackView.addArrangedSubview(UIView()) // Spacer
+        // Close button (only for type 2) - справа
         if updateState.updateType == 2 {
             headerStackView.addArrangedSubview(closeButton)
+        } else if updateState.channelData.postUrl == nil {
+            // Spacer справа, если нет ни close button, ни info button
+            headerStackView.addArrangedSubview(UIView())
         }
         containerView.addSubview(headerStackView)
         
@@ -244,120 +247,6 @@ public class ReleazioUpdatePromptViewController: UIViewController {
         }
         
         setupNativeConstraints()
-    }
-    
-    private func setupInAppUpdateStyle() {
-        // Set texts
-        titleLabel.text = updateTitle
-        let message = updateState.channelData.updateMessage.isEmpty ? updateMessage : updateState.channelData.updateMessage
-        messageLabel.text = message
-        
-        // Configure buttons
-        updateButton.setTitle(updateButtonText, for: .normal)
-        updateButton.setTitleColor(theme.primaryButtonTextColor, for: .normal)
-        updateButton.backgroundColor = theme.primaryButtonColor
-        updateButton.layer.cornerRadius = 14
-        updateButton.titleLabel?.font = .systemFont(ofSize: 18, weight: .semibold)
-        
-        skipButton.setTitle(skipButtonText + " (\(remainingSkipAttempts))", for: .normal)
-        skipButton.setTitleColor(theme.textColor.withAlphaComponent(0.6), for: .normal)
-        skipButton.backgroundColor = .clear
-        
-        // Setup full-screen view
-        view.backgroundColor = theme.backgroundColor
-        
-        // Header view (red background)
-        let headerView = UIView()
-        headerView.backgroundColor = theme.headerBackgroundColor
-        headerView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(headerView)
-        
-        // Header content
-        let headerStack = UIStackView()
-        headerStack.axis = .horizontal
-        headerStack.alignment = .center
-        headerStack.distribution = .fill
-        headerStack.spacing = 12
-        headerStack.translatesAutoresizingMaskIntoConstraints = false
-        
-        if updateState.updateType == 2 {
-            let closeBtn = UIButton(type: .system)
-            closeBtn.setImage(UIImage(systemName: "xmark"), for: .normal)
-            closeBtn.tintColor = theme.closeButtonColor
-            closeBtn.addTarget(self, action: #selector(closeTapped), for: .touchUpInside)
-            headerStack.addArrangedSubview(closeBtn)
-        } else {
-            headerStack.addArrangedSubview(UIView())
-        }
-        
-        headerStack.addArrangedSubview(UIView()) // Spacer
-        
-        headerView.addSubview(headerStack)
-        
-        // Content area
-        let contentStack = UIStackView()
-        contentStack.axis = .vertical
-        contentStack.alignment = .center
-        contentStack.spacing = 20
-        contentStack.translatesAutoresizingMaskIntoConstraints = false
-        
-        titleLabel.textAlignment = .center
-        titleLabel.textColor = theme.textColor
-        titleLabel.font = .systemFont(ofSize: 20, weight: .bold)
-        contentStack.addArrangedSubview(titleLabel)
-        
-        messageLabel.textAlignment = .center
-        messageLabel.textColor = theme.secondaryTextColor
-        messageLabel.font = .systemFont(ofSize: 16, weight: .semibold)
-        contentStack.addArrangedSubview(messageLabel)
-        
-        view.addSubview(contentStack)
-        
-        // Buttons stack
-        let buttonsStack = UIStackView()
-        buttonsStack.axis = .vertical
-        buttonsStack.alignment = .center
-        buttonsStack.spacing = 12
-        buttonsStack.translatesAutoresizingMaskIntoConstraints = false
-        
-        buttonsStack.addArrangedSubview(updateButton)
-        if updateState.updateType == 3 && remainingSkipAttempts > 0 {
-            buttonsStack.addArrangedSubview(skipButton)
-        }
-        
-        view.addSubview(buttonsStack)
-        
-        // Constraints
-        NSLayoutConstraint.activate([
-            // Header
-            headerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            headerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            headerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            headerView.heightAnchor.constraint(equalToConstant: 60),
-            
-            headerStack.topAnchor.constraint(equalTo: headerView.topAnchor, constant: 20),
-            headerStack.leadingAnchor.constraint(equalTo: headerView.leadingAnchor, constant: 20),
-            headerStack.trailingAnchor.constraint(equalTo: headerView.trailingAnchor, constant: -20),
-            headerStack.bottomAnchor.constraint(equalTo: headerView.bottomAnchor, constant: -16),
-            
-            // Content
-            contentStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            contentStack.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            contentStack.leadingAnchor.constraint(greaterThanOrEqualTo: view.leadingAnchor, constant: 20),
-            contentStack.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -20),
-            
-            // Buttons
-            buttonsStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            buttonsStack.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -40),
-            buttonsStack.leadingAnchor.constraint(greaterThanOrEqualTo: view.leadingAnchor, constant: 40),
-            buttonsStack.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -40),
-            
-            updateButton.widthAnchor.constraint(equalToConstant: 300),
-            updateButton.heightAnchor.constraint(equalToConstant: 56),
-            
-            skipButton.widthAnchor.constraint(equalToConstant: 300),
-            skipButton.heightAnchor.constraint(equalToConstant: 44)
-        ])
     }
     
     private func setupNativeConstraints() {
@@ -447,14 +336,14 @@ public class ReleazioUpdatePromptViewController: UIViewController {
         if let customColor = customColors?.updateButtonColor {
             return customColor
         }
-        return .systemBlue
+        return theme.primaryButtonColor
     }
     
     private var updateButtonTextColor: UIColor {
         if let customColor = customColors?.updateButtonTextColor {
             return customColor
         }
-        return .white
+        return theme.primaryButtonTextColor
     }
     
     // MARK: - Actions

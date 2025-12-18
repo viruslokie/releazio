@@ -510,7 +510,7 @@ public struct ReleazioUpdatePromptView: View {
 
 **Параметры:**
 - `updateState`: `UpdateState` из `checkUpdates()`
-- `style`: `.native` или `.inAppUpdate` (по умолчанию: `.default`, что равно `.native`)
+- `style`: `.native` (по умолчанию: `.default`, что равно `.native`)
 - `customColors`: Опциональные кастомные цвета для кнопок и текста (см. `UIComponentColors`)
 - `customStrings`: Опциональные кастомные локализованные строки (см. `UILocalizationStrings`)
 - `onUpdate`: Колбэк при нажатии на кнопку "Обновить"
