@@ -182,6 +182,7 @@ public class VersionUIKitView: UIView {
     }
     
     private func updateConstraintsForYellowDot() {
+        guard versionLabelLeadingConstraint != nil else { return }
         versionLabelLeadingConstraint.isActive = false
         if shouldShowYellowDot {
             versionLabelLeadingConstraint = versionLabel.leadingAnchor.constraint(equalTo: yellowDotView.trailingAnchor, constant: 12)
