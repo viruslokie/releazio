@@ -82,15 +82,14 @@ public class ReleazioUpdatePromptViewController: UIViewController {
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 20, weight: .bold)
-        label.textColor = .label
-        // Will be set in setupUI after initialization
+        // Color will be set in setupNativeStyle from customColors
         return label
     }()
     
     private lazy var infoButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(systemName: "questionmark.circle.fill"), for: .normal)
-        button.tintColor = .gray
+        // Color will be set in setupNativeStyle from customColors
         button.addTarget(self, action: #selector(infoTapped), for: .touchUpInside)
         return button
     }()
@@ -98,7 +97,7 @@ public class ReleazioUpdatePromptViewController: UIViewController {
     private lazy var closeButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(systemName: "xmark.circle.fill"), for: .normal)
-        button.tintColor = .systemGray
+        // Color will be set in setupNativeStyle from customColors
         button.addTarget(self, action: #selector(closeTapped), for: .touchUpInside)
         return button
     }()
@@ -106,10 +105,9 @@ public class ReleazioUpdatePromptViewController: UIViewController {
     private lazy var messageLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 16)
-        label.textColor = .secondaryLabel
+        // Color will be set in setupNativeStyle from customColors
         label.numberOfLines = 0
         label.textAlignment = .center
-        // Will be set in setupUI after initialization
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -205,16 +203,24 @@ public class ReleazioUpdatePromptViewController: UIViewController {
     private func setupNativeStyle() {
         // Set texts from custom strings or localization
         titleLabel.text = updateTitle
+        titleLabel.textColor = primaryTextColor
+        
         let message = updateState.channelData.updateMessage.isEmpty ? updateMessage : updateState.channelData.updateMessage
         messageLabel.text = message
+        messageLabel.textColor = secondaryTextColor
         
         updateButton.setTitle(updateButtonText, for: .normal)
         updateButton.setTitleColor(updateButtonTextColor, for: .normal)
         updateButton.backgroundColor = updateButtonColor
         
         skipButton.setTitle(skipButtonText + " (\(remainingSkipAttempts))", for: .normal)
-        skipButton.setTitleColor(.secondaryLabel, for: .normal)
-        skipButton.backgroundColor = .clear
+        skipButton.setTitleColor(skipButtonTextColor, for: .normal)
+        skipButton.backgroundColor = skipButtonColor
+        
+        closeButton.tintColor = closeButtonColor
+        infoButton.tintColor = linkColor
+        
+        containerView.backgroundColor = containerBackgroundColor
         
         view.addSubview(overlayView)
         view.addSubview(containerView)
@@ -344,6 +350,52 @@ public class ReleazioUpdatePromptViewController: UIViewController {
             return customColor
         }
         return theme.primaryButtonTextColor
+    }
+    
+    private var skipButtonColor: UIColor {
+        if let customColor = customColors?.skipButtonColor {
+            return customColor
+        }
+        return .clear
+    }
+    
+    private var skipButtonTextColor: UIColor {
+        if let customColor = customColors?.skipButtonTextColor {
+            return customColor
+        }
+        return .secondaryLabel
+    }
+    
+    private var closeButtonColor: UIColor {
+        if let customColor = customColors?.closeButtonColor {
+            return customColor
+        }
+        return .systemGray
+    }
+    
+    private var linkColor: UIColor {
+        if let customColor = customColors?.linkColor {
+            return customColor
+        }
+        return .gray
+    }
+    
+    private var primaryTextColor: UIColor {
+        if let customColor = customColors?.primaryTextColor {
+            return customColor
+        }
+        return .label
+    }
+    
+    private var secondaryTextColor: UIColor {
+        if let customColor = customColors?.secondaryTextColor {
+            return customColor
+        }
+        return .secondaryLabel
+    }
+    
+    private var containerBackgroundColor: UIColor {
+        return .systemBackground
     }
     
     // MARK: - Actions
