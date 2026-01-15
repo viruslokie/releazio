@@ -151,8 +151,6 @@ public class VersionUIKitView: UIView {
         addSubview(yellowDotView)
         addSubview(versionLabel)
         addSubview(updateButton)
-        
-        updateColors()
     }
     
     private var versionLabelLeadingConstraint: NSLayoutConstraint!
@@ -178,6 +176,9 @@ public class VersionUIKitView: UIView {
         updateButton.heightAnchor.constraint(equalToConstant: 44).isActive = true
         
         updateConstraintsForYellowDot()
+
+        // Colors call also updates yellow dot constraints. It must run after constraints are created.
+        updateColors()
     }
     
     private func updateConstraintsForYellowDot() {
