@@ -395,6 +395,10 @@ public class ReleazioUpdatePromptViewController: UIViewController {
     }
     
     private var containerBackgroundColor: UIColor {
+        // Use versionBackgroundColor if available, otherwise systemBackground
+        if let customColor = customColors?.versionBackgroundColor {
+            return customColor
+        }
         return .systemBackground
     }
     
