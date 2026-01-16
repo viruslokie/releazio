@@ -93,3 +93,8 @@ iOSInjectionProject/
 .DS_StoreDerived/
 *.xcodeproj/
 *.xcworkspace/
+
+# Generated files
+Derived/
+*.xcodeproj/
+*.xcworkspace/
