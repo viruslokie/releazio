@@ -191,12 +191,6 @@ public class VersionUIKitView: UIView {
         
         super.init(frame: frame)
         
-        print("🔵 [VersionUIKitView] init called")
-        print("   - layoutStyle: \(layoutStyle)")
-        print("   - buttonConfiguration: width=\(buttonConfiguration?.width?.description ?? "nil"), height=\(self.buttonConfiguration.height), cornerRadius=\(self.buttonConfiguration.cornerRadius), spacing=\(self.buttonConfiguration.spacing)")
-        print("   - frame: \(frame)")
-        print("   - isUpdateAvailable: \(isUpdateAvailable)")
-        
         setupUI(version: version, isUpdateAvailable: isUpdateAvailable)
         setupConstraints()
     }
@@ -240,13 +234,6 @@ public class VersionUIKitView: UIView {
         updateButton.isHidden = !isUpdateAvailable
         updateButton.addTarget(self, action: #selector(updateButtonTapped), for: .touchUpInside)
         
-        print("🟢 [VersionUIKitView] setupUI completed")
-        print("   - buttonText: '\(buttonText)'")
-        print("   - buttonFont: \(updateButton.titleLabel?.font?.pointSize ?? 0)pt")
-        print("   - contentEdgeInsets: \(updateButton.contentEdgeInsets)")
-        print("   - button.isHidden: \(updateButton.isHidden)")
-        print("   - button.intrinsicContentSize: \(updateButton.intrinsicContentSize)")
-        
         addSubview(yellowDotView)
         addSubview(versionLabel)
         addSubview(updateButton)
@@ -270,16 +257,9 @@ public class VersionUIKitView: UIView {
             let minWidthConstraint = widthAnchor.constraint(greaterThanOrEqualToConstant: fixedButtonWidth)
             minWidthConstraint.priority = .required
             minWidthConstraint.isActive = true
-            print("   ✅ Self min width constraint set: \(fixedButtonWidth)pt (to accommodate fixed-width button)")
         }
         
         if layoutStyle == .vertical {
-            print("🟡 [VersionUIKitView] setupConstraints: VERTICAL layout")
-            print("   - buttonConfiguration.height: \(buttonConfiguration.height)")
-            print("   - buttonConfiguration.width: \(buttonConfiguration.width?.description ?? "nil")")
-            print("   - buttonConfiguration.spacing: \(buttonConfiguration.spacing)")
-            print("   - buttonConfiguration.cornerRadius: \(buttonConfiguration.cornerRadius)")
-            
             // Vertical layout: version on top, button below
             yellowDotView.topAnchor.constraint(equalTo: topAnchor, constant: 8).isActive = true
             yellowDotView.centerYAnchor.constraint(equalTo: versionLabel.centerYAnchor).isActive = true
@@ -295,13 +275,11 @@ public class VersionUIKitView: UIView {
             let heightConstraint = updateButton.heightAnchor.constraint(equalToConstant: buttonConfiguration.height)
             heightConstraint.priority = .required
             heightConstraint.isActive = true
-            print("   ✅ Height constraint set: \(buttonConfiguration.height)pt, priority: \(heightConstraint.priority.rawValue)")
             
             // Bottom anchor with lower priority (only if view needs to stretch)
             let bottomConstraint = updateButton.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor)
             bottomConstraint.priority = .defaultLow
             bottomConstraint.isActive = true
-            print("   ✅ Bottom constraint set: lessThanOrEqualTo bottomAnchor, priority: \(bottomConstraint.priority.rawValue)")
             
             // Center button horizontally
             updateButton.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
@@ -309,24 +287,19 @@ public class VersionUIKitView: UIView {
             // Prevent button from stretching vertically - enforce fixed height
             updateButton.setContentHuggingPriority(.required, for: .vertical)
             updateButton.setContentCompressionResistancePriority(.required, for: .vertical)
-            print("   ✅ ContentHuggingPriority (vertical): \(updateButton.contentHuggingPriority(for: .vertical).rawValue)")
-            print("   ✅ ContentCompressionResistancePriority (vertical): \(updateButton.contentCompressionResistancePriority(for: .vertical).rawValue)")
             
             // Width configuration
             if let fixedWidth = buttonConfiguration.width {
                 // Fixed width: use exact width specified
                 updateButton.widthAnchor.constraint(equalToConstant: fixedWidth).isActive = true
-                print("   ✅ Fixed width constraint set: \(fixedWidth)pt")
             } else {
                 // Adaptive width: size to fit content (text + padding)
                 // Use intrinsic content size - button will size based on its text
                 updateButton.setContentHuggingPriority(.required, for: .horizontal)
                 updateButton.setContentCompressionResistancePriority(.required, for: .horizontal)
-                print("   ✅ Adaptive width: using intrinsic content size")
             }
             
             updateButton.layer.cornerRadius = buttonConfiguration.cornerRadius
-            print("   ✅ Corner radius set: \(buttonConfiguration.cornerRadius)")
         } else {
             // Horizontal layout: version on left, button on right (original)
             yellowDotView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
@@ -355,72 +328,10 @@ public class VersionUIKitView: UIView {
 
         // Colors call also updates yellow dot constraints. It must run after constraints are created.
         updateColors()
-        
-        print("🟣 [VersionUIKitView] setupConstraints completed")
-        print("   - All constraints installed")
     }
     
     public override func layoutSubviews() {
         super.layoutSubviews()
-        
-        print("🔴 [VersionUIKitView] layoutSubviews called")
-        print("   - self.frame: \(frame)")
-        print("   - self.bounds: \(bounds)")
-        print("   - updateButton.frame: \(updateButton.frame)")
-        print("   - updateButton.bounds: \(updateButton.bounds)")
-        print("   - updateButton.intrinsicContentSize: \(updateButton.intrinsicContentSize)")
-        
-        // Check all height-related constraints
-        let heightConstraints = updateButton.constraints.filter { $0.firstAttribute == .height }
-        print("   - updateButton height constraints count: \(heightConstraints.count)")
-        for (index, constraint) in heightConstraints.enumerated() {
-            print("     [\(index)] height constraint: constant=\(constraint.constant), priority=\(constraint.priority.rawValue), isActive=\(constraint.isActive)")
-        }
-        
-        // Check if button has conflicting constraints
-        let allConstraints = updateButton.constraints + constraints.filter { $0.firstItem === updateButton || $0.secondItem === updateButton }
-        let conflictingConstraints = allConstraints.filter { !$0.isActive }
-        if !conflictingConstraints.isEmpty {
-            print("   ⚠️ Found \(conflictingConstraints.count) inactive constraints on updateButton")
-        }
-        
-        // Check all width-related constraints
-        let widthConstraints = updateButton.constraints.filter { $0.firstAttribute == .width }
-        print("   - updateButton width constraints count: \(widthConstraints.count)")
-        for (index, constraint) in widthConstraints.enumerated() {
-            print("     [\(index)] width constraint: constant=\(constraint.constant), priority=\(constraint.priority.rawValue), isActive=\(constraint.isActive), relation=\(constraint.relation.rawValue)")
-        }
-        
-        // Check self width constraints
-        let selfWidthConstraints = constraints.filter { $0.firstAttribute == .width && ($0.firstItem === self || $0.secondItem === self) }
-        print("   - self width constraints count: \(selfWidthConstraints.count)")
-        for (index, constraint) in selfWidthConstraints.enumerated() {
-            print("     [\(index)] self width constraint: constant=\(constraint.constant), priority=\(constraint.priority.rawValue), isActive=\(constraint.isActive)")
-        }
-        
-        print("   - versionLabel.frame: \(versionLabel.frame)")
-        print("   - Expected button height: \(buttonConfiguration.height)pt")
-        print("   - Actual button height: \(updateButton.frame.height)pt")
-        if abs(updateButton.frame.height - buttonConfiguration.height) > 0.1 {
-            print("   ❌ HEIGHT MISMATCH! Expected: \(buttonConfiguration.height)pt, Actual: \(updateButton.frame.height)pt")
-        } else {
-            print("   ✅ Height matches configuration")
-        }
-        
-        print("   - Expected button width: \(buttonConfiguration.width?.description ?? "adaptive")pt")
-        print("   - Actual button width: \(updateButton.frame.width)pt")
-        if let expectedWidth = buttonConfiguration.width {
-            if abs(updateButton.frame.width - expectedWidth) > 0.1 {
-                print("   ❌ WIDTH MISMATCH! Expected: \(expectedWidth)pt, Actual: \(updateButton.frame.width)pt")
-            } else {
-                print("   ✅ Width matches configuration")
-            }
-        }
-        
-        print("   - self.width: \(frame.width)pt, button.width: \(updateButton.frame.width)pt")
-        if frame.width < updateButton.frame.width {
-            print("   ⚠️ WARNING: self width (\(frame.width)pt) is LESS than button width (\(updateButton.frame.width)pt)! Button will overflow.")
-        }
         
         // Update corner radius based on actual button size
         // For full rounding (pill shape), maximum corner radius is min(height, width) / 2
@@ -436,9 +347,6 @@ public class VersionUIKitView: UIView {
         
         if abs(updateButton.layer.cornerRadius - finalCornerRadius) > 0.1 {
             updateButton.layer.cornerRadius = finalCornerRadius
-            print("   🔄 Corner radius updated: \(finalCornerRadius)pt (max: \(maxCornerRadius)pt, config: \(buttonConfiguration.cornerRadius)pt)")
-        } else {
-            print("   ✅ Corner radius: \(updateButton.layer.cornerRadius)pt (max: \(maxCornerRadius)pt, config: \(buttonConfiguration.cornerRadius)pt)")
         }
     }
     
@@ -455,16 +363,9 @@ public class VersionUIKitView: UIView {
     
     public override func didMoveToSuperview() {
         super.didMoveToSuperview()
-        if superview != nil {
-            print("🟠 [VersionUIKitView] didMoveToSuperview: view added to hierarchy")
-            print("   - superview: \(type(of: superview!))")
-            print("   - self.frame: \(frame)")
-            print("   - updateButton.frame: \(updateButton.frame)")
-        }
     }
     
     private func updateColors() {
-        print("🟤 [VersionUIKitView] updateColors called")
         // Version label background
         if transparentVersionBackground {
             versionLabel.backgroundColor = .clear
@@ -510,11 +411,6 @@ public class VersionUIKitView: UIView {
         // Update yellow dot visibility and constraints
         yellowDotView.isHidden = !shouldShowYellowDot
         updateConstraintsForYellowDot()
-        
-        print("   - updateButton.backgroundColor: \(updateButton.backgroundColor?.description ?? "nil")")
-        print("   - updateButton.titleColor: \(updateButton.titleColor(for: .normal)?.description ?? "nil")")
-        print("   - updateButton.frame after colors: \(updateButton.frame)")
-        print("🟤 [VersionUIKitView] updateColors completed")
     }
     
     /// Whether to show yellow dot (post is unread)
