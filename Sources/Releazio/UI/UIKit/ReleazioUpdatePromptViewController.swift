@@ -180,6 +180,10 @@ public class ReleazioUpdatePromptViewController: UIViewController {
         self.remainingSkipAttempts = updateState.remainingSkipAttempts
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .overFullScreen
+        
+        if updateState.updateType == 3 {
+            isModalInPresentation = true
+        }
     }
     
     required init?(coder: NSCoder) {
