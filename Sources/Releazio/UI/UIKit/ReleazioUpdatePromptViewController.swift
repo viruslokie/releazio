@@ -297,7 +297,9 @@ public class ReleazioUpdatePromptViewController: UIViewController {
         
         NSLayoutConstraint.activate(constraints)
         
-        titleLabel.centerXAnchor.constraint(equalTo: headerStackView.centerXAnchor).isActive = true
+        let titleCenterConstraint = titleLabel.centerXAnchor.constraint(equalTo: headerStackView.centerXAnchor)
+        titleCenterConstraint.priority = .defaultHigh
+        titleCenterConstraint.isActive = true
     }
     
     private func updateUI() {
