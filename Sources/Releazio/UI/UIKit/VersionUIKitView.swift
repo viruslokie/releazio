@@ -56,7 +56,7 @@ public struct UpdateButtonConfiguration {
     
     /// Default configuration for vertical layout
     public static let verticalDefault = UpdateButtonConfiguration(
-        width: 55,
+        width: nil,  // Allow button to expand based on content
         height: 16,
         cornerRadius: 18,
         spacing: 8
@@ -293,8 +293,8 @@ public class VersionUIKitView: UIView {
         let buttonText = customStrings?.updateButtonText ?? localization.updateButtonText
         updateButton.setTitle(buttonText, for: .normal)
         updateButton.titleLabel?.font = UIFont.systemFont(ofSize: Constants.buttonFontSize, weight: Constants.buttonFontWeight)
-        updateButton.titleLabel?.adjustsFontSizeToFitWidth = true
-        updateButton.titleLabel?.minimumScaleFactor = Constants.buttonMinScaleFactor
+        updateButton.titleLabel?.adjustsFontSizeToFitWidth = false // Don't shrink text, let button expand
+        updateButton.titleLabel?.minimumScaleFactor = 1.0 // Don't scale text
         updateButton.contentEdgeInsets = Constants.buttonContentInsets
         updateButton.translatesAutoresizingMaskIntoConstraints = false
         updateButton.isHidden = !isUpdateAvailable
@@ -371,8 +371,16 @@ public class VersionUIKitView: UIView {
         if let fixedWidth = buttonConfiguration.width {
             updateButton.widthAnchor.constraint(equalToConstant: fixedWidth).isActive = true
         } else {
-            updateButton.setContentHuggingPriority(.required, for: .horizontal)
+            // Allow button to expand based on content with minimum width for "Обновить" text
+            // Minimum width to ensure text fits without truncation
+            let minWidthConstraint = updateButton.widthAnchor.constraint(greaterThanOrEqualToConstant: 100)
+            minWidthConstraint.priority = .required
+            minWidthConstraint.isActive = true
+            // Allow button to expand horizontally to fit content
+            updateButton.setContentHuggingPriority(.defaultLow, for: .horizontal)
             updateButton.setContentCompressionResistancePriority(.required, for: .horizontal)
+            // Ensure button doesn't compress text
+            updateButton.titleLabel?.setContentCompressionResistancePriority(.required, for: .horizontal)
         }
         
         updateButton.layer.cornerRadius = buttonConfiguration.cornerRadius
@@ -520,11 +528,9 @@ public class VersionUIKitView: UIView {
         postUrl = updateState.channelData.postUrl
         update(version: updateState.currentVersionName, isUpdateAvailable: updateState.isUpdateAvailable)
     }
-}
-
-// MARK: - Actions
-
-extension VersionUIKitView {
+    
+    // MARK: - Actions
+    
     @objc private func updateButtonTapped() {
         onUpdateTap?()
     }
